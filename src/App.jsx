@@ -1,21 +1,22 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { lazy } from "react";
+import { Route, Routes } from "react-router-dom";
+import { Layout } from "./Components/Layout/Layout";
+
 import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0);
+const HomePage = lazy(() => import("./Pages/Home"));
+const RegistrationPage = lazy(() => import("./Pages/Registration"));
+const LoginPage = lazy(() => import("./Pages/Login"));
 
+function App() {
   return (
-    <>
-      <h1>my project</h1>
-      <h2>Vite + React</h2>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
-    </>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="/registration" element={<RegistrationPage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
+    </Routes>
   );
 }
 

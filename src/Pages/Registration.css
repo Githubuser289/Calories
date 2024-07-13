@@ -1,0 +1,68 @@
+.registertxt {
+    padding: 40px 0 0 128px;
+    color: #FC842D;
+
+    @media screen and (min-width: 768px) {
+        padding: 160px 0 0 32px;
+    }
+
+    @media screen and (min-width: 768px) {
+        padding-left: 16px;
+    }
+}
+
+.registerform {
+    padding: 55px 0 0 20px;
+
+    @media screen and (min-width: 768px) {
+        padding-left: 32px;
+    }
+
+    @media screen and (min-width: 768px) {
+        padding-left: 16px;
+    }
+}
+
+.labelinput {
+    width: 240px;
+}
+
+.inputline {
+    width: 240px;
+    border: none;
+    border-bottom: 1px solid #E0E0E0;
+    margin-bottom: 32px;
+}
+
+.buttonsdiv {
+    margin: 28px 0 0 29px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    @media screen and (min-width: 768px) {
+        margin-left: 0px;
+        flex-direction: row;
+        gap: 32px;
+    }
+}
+
+.normalbtn {
+    width: 181px;
+    height: 44px;
+    border: none;
+    border-radius: 30px;
+    color: white;
+    background-color: #FC842D;
+    box-shadow: 0px 4px 10px 0px #FC842D80;
+}
+
+.reversebtn {
+    width: 181px;
+    height: 44px;
+    border: 2px solid #FC842D;
+    border-radius: 30px;
+    color: #FC842D;
+    background-color: white;
+    box-shadow: 0px 4px 10px 0px #FC842D80;
+}
