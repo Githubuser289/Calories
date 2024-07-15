@@ -4,12 +4,8 @@ import "./Home.css";
 import Modal from "../Components/Layout/Modal";
 
 export default function Home() {
-  const [show, setShowModal] = useState(true);
-  // const [modalContent, setModalContent] = useState("");
-  const [modalContent, setModalContent] = useState({
-    calories: 0,
-    foods: ["ala", "bala", "portocala", "lim", "pom", "plici"],
-  });
+  const [show, setShowModal] = useState(false);
+  const [modalContent, setModalData] = useState({});
   const [bloodType, setBloodType] = useState(null);
 
   const heightRef = useRef();
@@ -36,51 +32,14 @@ export default function Home() {
     const age = ageRef.current.value;
     const weight = weightRef.current.value;
     const dweight = dweightRef.current.value;
+    setModalData({ height, age, weight, dweight, bloodType });
 
-    console.log("Height:", height);
-    console.log("Age:", age);
-    console.log("Current weight:", weight);
-    console.log("Desirable weight:", dweight);
-    console.log("Blood type:", bloodType);
-
-    // ****************************
-    // Trimiterea datelor la server
-    // try {
-    // const response = await fetch("URL_SERVER", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     height,
-    //     age,
-    //     weight,
-    //     dweight,
-    //     bloodType,
-    //   }),
-    // });
-
-    // if (!response.ok) {
-    //   throw new Error("Network response was not ok");
-    // }
-
-    // const data = await response.json();
-    // setModalContent(`Calories per day: ${data.calories}`);
-    // setModalContent({
-    //   calories: 0,
-    //   foods: ["ala", "bala", "portocala"],
-    // });
-    showModal();
-
-    // Resetează valorile inputurilor
     heightRef.current.value = "";
     ageRef.current.value = "";
     weightRef.current.value = "";
     dweightRef.current.value = "";
     setBloodType(null);
-    // } catch (error) {
-    //   console.error("There was a problem with the fetch operation:", error);
-    // }
+    showModal();
   };
 
   return (
@@ -197,7 +156,7 @@ export default function Home() {
         </form>
       </div>
       <Modal show={show} handleClose={hideModal}>
-        {{ calories: modalContent.calories, foods: modalContent.foods }}
+        {modalContent}
       </Modal>
     </div>
   );
