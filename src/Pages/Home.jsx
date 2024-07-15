@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Helmet } from "react-helmet";
 import "./Home.css";
-import Modal from "../Components/Layout/Modal";
+import Modal from "../Components/Modal";
 
 export default function Home() {
   const [show, setShowModal] = useState(false);

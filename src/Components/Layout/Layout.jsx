@@ -1,7 +1,8 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
-import { Suspense } from "react";
+import { Toaster, toast } from "react-hot-toast";
+import React, { Suspense, useContext } from "react";
 import { useMediaQuery } from "react-responsive";
+import UserContext from "../../context/UserContext";
 import "./Layout.css";
 import logoImg from "../../images/logo.png";
 import leavesDesktop from "../../images/leaves-d.png";
@@ -11,22 +12,17 @@ import greyshapeTablet from "../../images/greyshape-t.png";
 import bananaDesktop from "../../images/banana-d.png";
 import bananaTablet from "../../images/banana-t.png";
 import strawberryImg from "../../images/strawberry.png";
-// import { useDispatch, useSelector } from "react-redux";
-// import { selectIsLoggedIn, selectUser } from "../redux/selectors";
-// import { logOut } from "../redux/operations";
 
 export function Layout() {
-  //   const dispatch = useDispatch();
+  const { user, setUser } = useContext(UserContext);
+
   const navigate = useNavigate();
-  //   const user = useSelector(selectUser);
-  //   const isLoggedIn = useSelector(selectIsLoggedIn);
-  const isLoggedIn = false;
+
   let leavesImg, greyshapeImg, bananaImg;
   let isMobile = true;
   let isTablet = useMediaQuery({ query: "(min-width: 768px)" });
   let isDesktop = useMediaQuery({ query: "(min-width: 1280px)" });
-  // const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
-  // const isRetina = useMediaQuery({ query: "(min-resolution: 2dppx)" });
+
   if (isTablet) {
     isMobile = false;
     leavesImg = leavesTablet;
@@ -40,10 +36,27 @@ export function Layout() {
     bananaImg = bananaDesktop;
   }
 
-  function handleLogout() {
-    // dispatch(logOut());
-    // navigate("/");
-    console.log("logout");
+  async function handleLogout() {
+    try {
+      const response = await fetch("/api/users/logout", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("token");
+        setUser({ email: "", isLoggedIn: false });
+        navigate("/login");
+        toast.success("Logout successful");
+      } else {
+        const data = await response.json();
+        toast.error(data.message || "Logout failed");
+      }
+    } catch (error) {
+      toast.error("An error occurred during logout");
+    }
   }
 
   return (
@@ -61,14 +74,16 @@ export function Layout() {
           )}
         </div>
         {isDesktop && <div className="verticalseparator"></div>}
-        {isLoggedIn ? (
+        {user.isLoggedIn ? (
           <div className="rightdiv">
             <div>{user.email}</div>
-            <NavLink onClick={handleLogout}>Exit</NavLink>
+            <NavLink to="/" onClick={handleLogout}>
+              Exit
+            </NavLink>
           </div>
         ) : (
           <div className="rightdiv">
-            <NavLink to="/login">LOG IN</NavLink>{" "}
+            <NavLink to="/login">LOG IN</NavLink>
             <NavLink to="/registration">REGISTRATION</NavLink>
           </div>
         )}

@@ -6,7 +6,7 @@
         padding: 160px 0 0 32px;
     }
 
-    @media screen and (min-width: 768px) {
+    @media screen and (min-width: 1024px) {
         padding-left: 16px;
     }
 }
@@ -18,7 +18,7 @@
         padding-left: 32px;
     }
 
-    @media screen and (min-width: 768px) {
+    @media screen and (min-width: 1024px) {
         padding-left: 16px;
     }
 }
@@ -32,6 +32,7 @@
     border: none;
     border-bottom: 1px solid #E0E0E0;
     margin-bottom: 32px;
+    outline: none;
 }
 
 .buttonsdiv {
@@ -47,22 +48,23 @@
     }
 }
 
-.normalbtn {
+.normalbtn,
+.reversebtn {
     width: 181px;
     height: 44px;
     border: none;
     border-radius: 30px;
     color: white;
-    background-color: #FC842D;
     box-shadow: 0px 4px 10px 0px #FC842D80;
+    cursor: pointer;
+}
+
+.normalbtn {
+    background-color: #FC842D;
 }
 
 .reversebtn {
-    width: 181px;
-    height: 44px;
     border: 2px solid #FC842D;
-    border-radius: 30px;
-    color: #FC842D;
     background-color: white;
-    box-shadow: 0px 4px 10px 0px #FC842D80;
+    color: #FC842D;
 }
