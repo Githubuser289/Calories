@@ -4,14 +4,19 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import "./Dashboard.css";
 import Modal from "../Components/Modal";
+import axios from "axios";
 
 export default function DashboardPage() {
   const [show, setShowModal] = useState(false);
   const [modalContent, setModalData] = useState({});
   const [bloodType, setBloodType] = useState(null);
-  const [qDate, setqDate] = useState("");
   const [foods, setFoods] = useState(["Your diet will be displayed here"]);
   const [activeButton, setActiveButton] = useState("button1");
+  const [dayList, setDayList] = useState([
+    { name: "Amaranth", cal: 371 },
+    { name: "Green buckwheat", cal: 295 },
+    { name: "Muesli Bon", cal: 333 },
+  ]);
 
   const heightRef = useRef();
   const ageRef = useRef();
@@ -30,6 +35,32 @@ export default function DashboardPage() {
     setSelectedDate(new Date());
   }, []);
 
+  useEffect(() => {
+    const fetchConsumedProducts = async (date) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/day/${date}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log("response ", response.data);
+        let worklist = response.data.data;
+        worklist.forEach((obj) => {
+          obj.cal = generateRandomNumber();
+        });
+        setDayList(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching consumed products:", error);
+        setDayList([]);
+      }
+    };
+    console.log("useff selectedDate");
+    fetchConsumedProducts(formatDate(selectedDate));
+  }, [selectedDate]);
+
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setShowDatePicker(false);
@@ -39,13 +70,19 @@ export default function DashboardPage() {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
+    return `${month < 10 ? "0" : ""}${month}-${
+      day < 10 ? "0" : ""
+    }${day}-${year}`;
+  };
+
+  const formatDate2 = (date) => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
     return `${day < 10 ? "0" : ""}${day}-${
       month < 10 ? "0" : ""
     }${month}-${year}`;
   };
-
-  const daylist = ["asdfsadf", "asdfasdsad143", "sad0987"];
-  // const daylist = [];
 
   const handleBloodTypeChange = (event) => {
     setBloodType(event.target.value);
@@ -72,6 +109,26 @@ export default function DashboardPage() {
     const dweight = dweightRef.current.value;
     setModalData({ height, age, weight, dweight, bloodType });
 
+    try {
+      const response = await axios.get("/api/day", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        params: {
+          height,
+          age,
+          currentWeight: weight,
+          desiredWeight: dweight,
+          bloodType,
+        },
+      });
+
+      setFoods(response.data.foodNotRcmnded);
+      dailyVal = response.data.dailyCalIntake;
+    } catch (error) {
+      console.error("Error fetching daily intake:", error);
+    }
+
     heightRef.current.value = "";
     ageRef.current.value = "";
     weightRef.current.value = "";
@@ -84,6 +141,19 @@ export default function DashboardPage() {
     event.preventDefault();
     console.log("query submitted");
   };
+
+  function generateRandomNumber(min = 150, max = 500) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const calculateValues = () => {
+    consumedVal = dayList.reduce((sum, product) => sum + product.amount, 0);
+    leftVal = dailyVal - consumedVal;
+    percentVal = (consumedVal / dailyVal) * 100;
+  };
+
+  // calculateValues();
+
   return (
     <>
       <div className="buttons">
@@ -217,7 +287,7 @@ export default function DashboardPage() {
       {activeButton === "button1" && (
         <div>
           <div className="date-picker-button">
-            <span className="title4">{formatDate(selectedDate)}</span>
+            <span className="title4">{formatDate2(selectedDate)}</span>
             <button
               className="calndbtn"
               onClick={() => setShowDatePicker(!showDatePicker)}
@@ -258,16 +328,21 @@ export default function DashboardPage() {
             </div>
             <button className="round-button">+</button>
           </form>
-          <ul className="daylist">
-            {daylist.map((food, index) => (
-              <li key={index}>{food}</li>
+
+          <div className="food-list">
+            {dayList.map((food, index) => (
+              <div key={index} className="food-item">
+                <div className="food-name">{food.name}</div>
+                <div className="food-amount">{food.amount} g</div>
+                <div className="food-cal">{food.cal} kcal</div>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
       <div className="summary">
         <div>
-          <p className="stitle">Summary for {formatDate(selectedDate)}</p>
+          <p className="stitle">Summary for {formatDate2(selectedDate)}</p>
           <div className="line">
             <p>Left</p>
             <p>{leftVal} kcal</p>

@@ -28,6 +28,8 @@ export default function Login() {
     });
 
     const data = await response.json();
+    console.log("login data ", data);
+    localStorage.setItem("token", data.token);
 
     if (response.ok) {
       toast.success("Login successful!");
