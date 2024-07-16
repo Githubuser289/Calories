@@ -22,6 +22,7 @@ export function Layout() {
   let isMobile = true;
   let isTablet = useMediaQuery({ query: "(min-width: 768px)" });
   let isDesktop = useMediaQuery({ query: "(min-width: 1280px)" });
+  let navClass;
 
   if (isTablet) {
     isMobile = false;
@@ -34,6 +35,12 @@ export function Layout() {
     leavesImg = leavesDesktop;
     greyshapeImg = greyshapeDesktop;
     bananaImg = bananaDesktop;
+  }
+
+  if (isDesktop && user.isLoggedIn) {
+    navClass = "logged";
+  } else {
+    navClass = "notlogged";
   }
 
   async function handleLogout() {
@@ -61,7 +68,7 @@ export function Layout() {
 
   return (
     <div className="layout">
-      <nav>
+      <nav className={navClass}>
         <div className="leftdiv">
           <NavLink to="/">
             <img className="logo" src={logoImg} alt="logo" />
@@ -73,11 +80,14 @@ export function Layout() {
             </NavLink>
           )}
         </div>
-        {isDesktop && <div className="verticalseparator"></div>}
+        {isDesktop && !user.isLoggedIn && (
+          <div className="verticalseparator"></div>
+        )}
         {user.isLoggedIn ? (
           <div className="rightdiv">
-            <div>{user.email}</div>
-            <NavLink to="/" onClick={handleLogout}>
+            <div className="user">{user.email}</div>
+            <div className="verticalseparator"></div>
+            <NavLink className="exit" to="/" onClick={handleLogout}>
               Exit
             </NavLink>
           </div>
@@ -88,13 +98,14 @@ export function Layout() {
           </div>
         )}
       </nav>
-      <div className="background">
-        <img className="leaves" src={leavesImg} alt="leaves" />
-        <img className="greyshape" src={greyshapeImg} alt="greyshape" />
-        <img className="banana" src={bananaImg} alt="banana" />
-        <img className="strawberry" src={strawberryImg} alt="strawberry" />
-        {/* <div className="whiteborder"></div> */}
-      </div>
+      {!user.isLoggedIn && (
+        <div className="background">
+          <img className="leaves" src={leavesImg} alt="leaves" />
+          <img className="greyshape" src={greyshapeImg} alt="greyshape" />
+          <img className="banana" src={bananaImg} alt="banana" />
+          <img className="strawberry" src={strawberryImg} alt="strawberry" />
+        </div>
+      )}
       <Suspense fallback={null}>
         <Outlet />
       </Suspense>

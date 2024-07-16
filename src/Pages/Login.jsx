@@ -30,9 +30,9 @@ export default function Login() {
     const data = await response.json();
 
     if (response.ok) {
+      toast.success("Login successful!");
       login(); // Setăm utilizatorul ca autentificat
       setUser({ email, isLoggedIn: true });
-      toast.success("Login successful!");
       navigate("/dashboard");
     } else {
       toast.error(data.message || "Login failed!");

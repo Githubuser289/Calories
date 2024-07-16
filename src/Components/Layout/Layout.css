@@ -25,6 +25,9 @@ nav {
         padding: 80px 0 0 16px;
     }
 }
+.logged {
+        justify-content: space-between;
+}
 .leftdiv {
     display: flex;
     flex-direction: row;
@@ -70,6 +73,7 @@ nav {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding-right: 30px;
     @media screen and (min-width: 1280px) {
         padding-bottom: 4px;
     }
@@ -79,11 +83,17 @@ nav {
         gap: 24px;
     }
 }
+.user {
+    color: #212121;
+}
+.exit {
+    color: #9B9FAA;
+}
 .background {
     z-index: -10;
     position: absolute;
     top: 0;
-    left: 0;
+    margin: 0 auto;
 }
 .leaves {
     display: none;
@@ -176,27 +186,3 @@ nav {
         left: 958px;
     }
 }
-/* .whiteborder {
-    display: none;
-    z-index: -1; */
-
-    /* for tablet*/
-    /* @media screen and (min-width: 768px) {
-        display: block;
-        width: 768px;
-        height: 1024px;
-        position: absolute;
-        top: 0;
-        left: 0;
-    } */
-
-    /* for desktop */
-    /* @media screen and (min-width: 1280px) {
-        display: block;
-        width: 1280px;
-        height: 850px;
-        position: absolute;
-        top: 0;
-        left: 0;
-    } */
-/* }  */

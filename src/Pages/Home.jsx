@@ -13,16 +13,16 @@ export default function Home() {
   const weightRef = useRef();
   const dweightRef = useRef();
 
+  const handleBloodTypeChange = (event) => {
+    setBloodType(event.target.value);
+  };
+
   const showModal = () => {
     setShowModal(true);
   };
 
   const hideModal = () => {
     setShowModal(false);
-  };
-
-  const handleBloodTypeChange = (event) => {
-    setBloodType(event.target.value);
   };
 
   const submitDataAndShowModal = async (event) => {
