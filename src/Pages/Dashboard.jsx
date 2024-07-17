@@ -3,30 +3,23 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 import "./Dashboard.css";
-import Modal from "../Components/Modal";
 import axios from "axios";
 
 export default function DashboardPage() {
-  const [show, setShowModal] = useState(false);
-  const [modalContent, setModalData] = useState({});
   const [bloodType, setBloodType] = useState(null);
   const [foods, setFoods] = useState(["Your diet will be displayed here"]);
   const [activeButton, setActiveButton] = useState("button1");
-  const [dayList, setDayList] = useState([
-    { name: "Amaranth", cal: 371 },
-    { name: "Green buckwheat", cal: 295 },
-    { name: "Muesli Bon", cal: 333 },
-  ]);
+  const [dayList, setDayList] = useState([]);
 
   const heightRef = useRef();
   const ageRef = useRef();
   const weightRef = useRef();
   const dweightRef = useRef();
 
-  let leftVal = 0;
-  let consumedVal = 0;
-  let dailyVal = 0;
-  let percentVal = 0;
+  const [dailyVal, setDailyVal] = useState(0);
+  const [leftVal, setLeftVal] = useState(0);
+  const [consumedVal, setConsumedVal] = useState(0);
+  const [percentVal, setPercentVal] = useState(0);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -46,18 +39,26 @@ export default function DashboardPage() {
             },
           }
         );
-        console.log("response ", response.data);
         let worklist = response.data.data;
+        let value = Math.round(response.data.dailyrate);
+        setDailyVal(value);
+        let calSum = 0;
         worklist.forEach((obj) => {
-          obj.cal = generateRandomNumber();
+          let newVal = generateRandomNumber();
+          obj.cal = newVal;
+          calSum += newVal;
         });
-        setDayList(response.data.data || []);
+        setConsumedVal(calSum);
+        setLeftVal(value - calSum);
+        calSum = (calSum / value) * 100;
+        setPercentVal(Math.round(calSum));
+        setDayList(worklist);
       } catch (error) {
         console.error("Error fetching consumed products:", error);
         setDayList([]);
+        setDailyVal(0);
       }
     };
-    console.log("useff selectedDate");
     fetchConsumedProducts(formatDate(selectedDate));
   }, [selectedDate]);
 
@@ -92,39 +93,38 @@ export default function DashboardPage() {
     setActiveButton(button);
   };
 
-  const showModal = () => {
-    setShowModal(true);
-  };
-
-  const hideModal = () => {
-    setShowModal(false);
-  };
-
-  const submitDataAndShowModal = async (event) => {
+  const submitAndGetSummary = async (event) => {
     event.preventDefault();
 
     const height = heightRef.current.value;
     const age = ageRef.current.value;
     const weight = weightRef.current.value;
     const dweight = dweightRef.current.value;
-    setModalData({ height, age, weight, dweight, bloodType });
 
     try {
-      const response = await axios.get("/api/day", {
+      const response = await fetch("http://localhost:3000/api/intake", {
+        method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
         },
-        params: {
+        body: JSON.stringify({
           height,
           age,
           currentWeight: weight,
           desiredWeight: dweight,
           bloodType,
-        },
+        }),
       });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
 
-      setFoods(response.data.foodNotRcmnded);
-      dailyVal = response.data.dailyCalIntake;
+      setFoods(data.foodNotRcmnded);
+      setDailyVal(Math.round(data.dailyCalIntake));
+      setLeftVal(0);
+      setConsumedVal(0);
+      setPercentVal(0);
     } catch (error) {
       console.error("Error fetching daily intake:", error);
     }
@@ -134,7 +134,6 @@ export default function DashboardPage() {
     weightRef.current.value = "";
     dweightRef.current.value = "";
     setBloodType(null);
-    showModal();
   };
 
   const submitQuery = (event) => {
@@ -145,14 +144,6 @@ export default function DashboardPage() {
   function generateRandomNumber(min = 150, max = 500) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
-
-  const calculateValues = () => {
-    consumedVal = dayList.reduce((sum, product) => sum + product.amount, 0);
-    leftVal = dailyVal - consumedVal;
-    percentVal = (consumedVal / dailyVal) * 100;
-  };
-
-  // calculateValues();
 
   return (
     <>
@@ -177,7 +168,7 @@ export default function DashboardPage() {
           <p className="title5">
             Calculate your daily calorie intake right now
           </p>
-          <form className="homeform" onSubmit={submitDataAndShowModal}>
+          <form className="homeform" onSubmit={submitAndGetSummary}>
             <div className="bigdiv">
               <div className="labelinput">
                 <label htmlFor="height">Height *</label>
@@ -357,10 +348,9 @@ export default function DashboardPage() {
           </div>
           <div className="line">
             <p>n% of normal</p>
-            <p>{percentVal} kcal</p>
+            <p>{percentVal} %</p>
           </div>
         </div>
-
         <div className="space"></div>
         <div>
           <p className="stitle">Food not recommended</p>
@@ -371,10 +361,6 @@ export default function DashboardPage() {
           </ul>
         </div>
       </div>
-
-      <Modal show={show} handleClose={hideModal}>
-        {modalContent}
-      </Modal>
     </>
   );
 }
